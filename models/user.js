@@ -1,7 +1,8 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+
+const {isBefore} = require('date-fns');
+
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -12,17 +13,74 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-  };
-  User.init({
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    email: DataTypes.STRING,
-    password: DataTypes.STRING,
-    birthday: DataTypes.DATEONLY,
-    isMale: DataTypes.BOOLEAN
-  }, {
-    sequelize,
-    modelName: 'User',
-  });
+  }
+  User.init(
+    {
+      firstName: {
+        type: DataTypes.STRING(64),
+        allowNull: false,
+        field: 'first_name',
+        validate: {
+          notNull: true,
+          notEmpty: true,
+        }
+      },
+      lastName: {
+        type: DataTypes.STRING(64),
+        allowNull: false,
+        field: 'last_name',
+        validate: {
+          notNull: true,
+          notEmpty: true
+        }
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          notNull: true,
+          notEmpty: true,
+          isEmail: true
+        }
+      },
+      password: {
+        type: DataTypes.STRING(64),
+        allowNull: false,
+        field: 'password_hash',
+        validate: {
+          notNull: true,
+          notEmpty: true
+        }
+      },
+      birthday: { 
+        type: DataTypes.DATEONLY, 
+        allowNull: false,
+        validate: {
+          notNull: true,
+          isDate: true,
+          isValidDate(value) {
+            if(isBefore(new Date(), new Date(value))) {
+              throw new Error('Bad Birthday date');
+            }
+          }
+        }
+      },
+      isMale: {
+        type: DataTypes.BOOLEAN,
+        field: 'is_male',
+        allowNull: false,
+        validate : {
+          notNull: true,
+        }
+      },
+    },
+    {
+      sequelize,
+      modelName: 'User',
+      underscored: true,
+      tableName: 'users'
+    }
+  );
   return User;
 };
