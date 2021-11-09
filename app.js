@@ -8,6 +8,11 @@ app.use(bodyParser);
 
 app.get('/users', UserController.getUsers);
 
-app.post('/user')
+app.post('/user', UserController.createUser);
+
+app.patch('/user/:id', UserController.updateUser);
+
+app.delete('/user/:id', UserController.deleteUser);
+
 
 module.exports = app;
