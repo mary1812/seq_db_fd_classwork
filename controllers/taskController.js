@@ -2,9 +2,9 @@ const { Task } = require('../models');
 
 module.exports.createTask = async (req, res, next) => {
   try {
-    const { body } = req;
+    const { body, params: { userId } } = req;
 
-    const newTask = await Task.create(body);
+    const newTask = await Task.create({...body, userId});
 
     res.send(newTask);
   } catch (err) {
